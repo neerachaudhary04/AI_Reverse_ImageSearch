@@ -1,6 +1,6 @@
 # Dev Container
 
-Note: This folder is useful only in online IDE like Codespaces or VS Code Dev Containers. Its not needed for local development
+Note: This folder is useful for online IDE -Codespaces (not needed for local development).
 
 This folder contains the GitHub Codespaces / VS Code Dev Containers setup for the project.
 
