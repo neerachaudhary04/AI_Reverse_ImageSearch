@@ -1,0 +1,23 @@
+# Core API & Server
+fastapi
+uvicorn[standard]
+python-multipart
+python-dotenv
+
+# Image Processing
+pillow
+
+# Deep Learning & Computer Vision
+torch
+torchvision
+numpy==1.26.4
+
+# Search Index
+faiss-cpu
+
+# Cloud Storage (optional)
+boto3
+
+# HuggingFace Integration for search image dataset
+huggingface-hub 
+#huggingface-datasets -not needed. As I am building urls on demand for top k similar images and I am fetching only those images from hugging face.
