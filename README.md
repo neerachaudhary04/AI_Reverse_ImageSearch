@@ -1,7 +1,7 @@
 # Reverse Image Search
 
 Product Search with DINOv2 and FAISS:
-This is end-to-end reverse image search engine where user upload a image and can retrieve similar items. Pre-trained transformer backbone (DINOv2 Vision) was fine-tuned with a custom 128-D projection head via triplet loss with semi-hard negative mining on ~25k images. The web application combines a lightweight web client, a FastAPI inference service, and FAISS-based vector search over fine tuned DINOv2 embeddings, and is deployed on AWS using ECS, FARGATE.
+This is end-to-end reverse image search engine where users upload a image and can retrieve similar items. Pre-trained transformer backbone (DINOv2 Vision) was fine-tuned with a custom 128-D projection head via triplet loss with semi-hard negative mining on ~25k images. The web application combines a lightweight web client, a FastAPI inference service, and FAISS-based vector search over fine-tuned DINOv2 embeddings, and is deployed on AWS using ECS, FARGATE.
 
 The fine-tuned model achieves:
 - **~85.6% Recall@1**
@@ -9,75 +9,94 @@ The fine-tuned model achieves:
 - **~96.5% Recall@10**
 
 ## Business problem:
-In the fast-paced landscape of fashion, the increasing volume of visual content poses a challenge for efficient search and retrieval. Recognizing this, this project aims to introduce a solution – the Deep Learning Based reverse image search. This project involves utilizing Deep Learning to analyze the intricate patterns within the user-shared image, enabling the identification of the outfit they wish to find, and suggest similar items.
+In the fast-paced landscape of fashion, the increasing volume of visual content poses a challenge for efficient search and retrieval. Recognizing this, this project aims to introduce a solution – the Deep Learning Based reverse image search. This project involves utilizing Deep Learning to analyze the intricate patterns within the user-shared image, enabling the identification of the outfit they wish to find, and suggesting similar items.
 
 ## Demo:
+![AI Image Lens interface](Images/AI%20Image%20Lens%20.png)
 
+![Top-k retrieval results](Images/Results.png)
+
+- The application demostrates very high throughput, the reasons behind high performance are:
+    - Use of FASTAPI for ultra-thin async routing
+    - The FAISS index is fully loaded into memory at startup, avoiding disk or network hops during search.
+    - LRU Cache 
+    - Lazy Loading
 
 ## System Architecture
 The system has two main parts:
-1. Offline training & bundling: Fine-tuned DINOv2 + projection head and build the FAISS index.
-2. Online inference & search: serve the trained model behind a browser UI.
-
-## Offline Model training & bundling 
-
-![Offline training architecture](Images/Offline_training.png)
-
-- Detail process: 
-  - Loaded the Pre-trained DINOv2 backbone.
-  - Fine tuned it with a 128-D projection head using triplet loss + semi-hard mining on ~25k fashion images.
-  - Computed embeddings for every gallery image.
-  - Built a FAISS index and metadata mapping id 
-  - Calculated the recall as Recall@1: 85.56%, Recall@5: 94.42%, Recall@10: 96.46%
-
-Model was trained on Google Colab using Nvidia A100 GPU. 
-Outputs of Offline training: 
-- model weights + config,
-- FAISS index + metadata
+1. Online inference & search: serves the trained model behind a browser UI.
+2. Offline training & bundling: Fine-tunes DINOv2 + projection head and build the FAISS index.
 
 
 ## Online inference & search
 
 ![Online search architecture](Images/Online_Search_Architecture.png)
 
-- Browser uploads query image via `/api/search-image`, served by the Node/Express frontend (ECS Fargate) behind ALB.
-- FastAPI service (ECS Fargate) encodes the query with DINOv2, searches the in-memory FAISS index, and returns JSON results with `/api/thumb` URLs.
-- For each image/thumbnail request, FastAPI pulls from the in-memory LRU cache when available; on a cache miss it downloads the gallery asset from S3 (or Hugging Face, depending on config) and streams the JPEG bytes back to the client.
-- Model weights, FAISS index, and gallery metadata are downloaded during startup from S3 so the inference container is self-contained.
+- On Startup:
+    - FastAPI backend downloads the fine-tuned DINOv2 weights, FAISS index, and metadata from S3 (or local/HF, depending on config) and loads them into memory. This enables very high speed search. 
+
+- Per request (`/api/search-image`):
+    - The browser uploads a query image to `/api/search-image`, which is handled by the Node/Express frontend (ECS Fargate) behind the AWS ALB and proxied to the FastAPI service.
+    - FastAPI runs the DINOv2 feature extractor and generates a 128-dimensional L2-normalized embedding for the query image.
+    - The embedding is used to query the in-memory FAISS index.
+    - The backend constructs image URLs and metadata for the top-K items based on the FAISS results.
+    - A lazy loader fetches the underlying image bytes (from S3) and caches them via an in-memory LRU cache for subsequent thumbnail requests.
+    - FastAPI returns JSON search results (ids, scores, image/thumbnail URLs) to the frontend.
+    - The frontend uses these URLs to fetch thumbnails and render the final results grid in the browser.
 
 
-## Model & Dataset details
-This project uses the **In-Shop Clothes Retrieval** dataset, which is organized into three logical parts:
 
-- **train** – images used to learn the embedding model
-- **query** – query images used only at evaluation time
-- **gallery** – catalog images retrieved at evaluation time
+## Offline Model training  
 
-### Train / Validation Split
+![Offline training architecture](Images/Offline_training.png)
 
-To monitor overfitting and tune hyperparameters, the training data is split into **train** and **validation** subsets. Model wtraining is performed on the `train` partition only.
 
-1. Load the `train` split as an `InShopDataset`.
-2. Shuffle all indices.
-3. Reserve a fixed fraction (`VAL_SPLIT_RATIO`, e.g. 10%) as the **validation set**.
-4. Use the remaining images as the **training set**.
+- **Dataset Details:**
+This project uses the **[In-Shop Clothes Retrieval Benchmark](https://mmlab.ie.cuhk.edu.hk/projects/DeepFashion/InShopRetrieval.html)** dataset, which is organized into three logical parts:
 
-This gives two disjoint loaders:
+   - **train** – images used to learn the embedding model. 
+   - **query** – query images used only at evaluation time to calculate retrieval metrics such as Recall@1, Recall@5, Recall@10.
+   - **gallery** – catalog images that the system retrieves from. These are used during evaluation (paired with the query split) and also serve as the retrieval database at inference time (when real users search).
 
-- `train_loader` – used to optimize the DINOv2 + 128-D embedding head with triplet loss.
-- `val_loader` – used to track validation loss/recall during training.
+- **Backbone & head**
+  - Loaded a **pretrained DINOv2 ViT-B/14** backbone.
+  - Added a **128-D embedding (projection) head** and partially unfroze the top transformer blocks for fine-tuning.
+  
+- **Data splits**
+  - Used the In-Shop **`train`** split to learn the embedding model.
+  - Randomly shuffled all indices and held out **15%** (`VAL_SPLIT_RATIO = 0.15`) as a **validation set**.
+  - The remaining **85%** of the `train` split was used as the **training subset**.
 
-### Test / Retrieval Evaluation
+- **Batching & loss**
+  - Class-balanced batches with **P = 24 classes** and **M = 4 images per class** → **96 images per batch**.
+  - Used a **TripletMarginLoss** with **semi-hard negative mining** to learn a metric space for retrieval.
 
-Final retrieval performance is measured on the **standard In-Shop protocol**:
+- **Optimization**
+  - Optimizer: **Adam** with learning rate **1e-4**.
+  - Mixed-precision training via `torch.amp.autocast("cuda")` and `GradScaler`.
+  - Learning rate scheduling with **ReduceLROnPlateau** on validation loss (factor **0.1**, patience **3**).
 
-1. Build an `InShopEvalDataset` for the **gallery** split and compute embeddings for all gallery images with the trained model.
-2. Build another `InShopEvalDataset` for the **query** split and compute embeddings for all query images.
-3. For each query embedding, perform vector search over the gallery embeddings using **FAISS**.
-4. Compute **Recall@K** metrics:
-   - **Recall@1** – how often the correct item is the top result.
-   - **Recall@5** – how often the correct item appears in the top 5 results.
-   - **Recall@10** – how often the correct item appears in the top 10 results.
+- **Epochs & early stopping**
+  - Configured for up to **50 epochs** (`num_epochs = 50`).
+  - After each epoch, the model is evaluated on the **validation** subset and the **validation loss** is computed.
+  - **Early stopping**:
+    - Tracks the best validation loss seen so far.
+    - If validation loss **does not improve for 7 consecutive epochs** (`patience = 7`), training stops early.
+    - This is to prevent overfitting and unnecessary extra epochs.
+
+- **Checkpointing**
+  - At the end of **every epoch**, the model weights are saved as:
+    - `epoch_{epoch}.pth` inside the checkpoint directory.
+  - When a new best validation loss is observed:
+    - The model is additionally saved as **`best_model.pth`**.
+    - This **best_model.pth** checkpoint is the one later used for embedding extraction, FAISS indexing, and evaluation.
+
+- **Evaluation / Recall@K**
+  - After training, the **best_model.pth** checkpoint is loaded.
+  - Embeddings are computed for the In-Shop Clothes Retrieval **`gallery`** and **`query`** splits.
+  - A FAISS index is built on the gallery embeddings.
+  - For each query embedding, nearest neighbors are retrieved from the gallery to compute **Recall@1** and **Recall@10**.
+  - These query and gallery splits are used only at evaluation time to compute Recall@K.
 
 In this project, the trained model achieves approximately:
 
@@ -85,25 +104,33 @@ In this project, the trained model achieves approximately:
 - **~94.42% Recall@5**
 - **~96.5% Recall@10**
 
+The model was trained on Google Colab using Nvidia A100 GPU. 
+Outputs of Offline training: 
+- model weights + config
+- FAISS index + metadata
+
+## Web Application
 
 ### Frontend (public/)
--  HTML/CSS/JS 
-- `public/app.js` handles validation, previews, multipart uploads, streaming thumbnails, and UX states.
-- The Express wrapper (server.js) serves the bundle and proxies /api/* for deployment
+- HTML/CSS/JS 
+  - `public/app.js` handles validation, previews, multipart uploads, streaming thumbnails, and UX states.
+  - The Express wrapper (server.js) serves the bundle and proxies /api/* for deployment
 
 ### Backend API (backend/)
-- `backend/main.py` bootstraps FastAPI, wires routers, and injects singleton instances of the embedding model + FAISS index.
-- Routes:
-  - `/api/search-image` – accepts multipart uploads, encodes via DINOv2, and queries FAISS for top-K matches.
-  - `/api/thumb/{idx}` – streams JPEG thumbnails; uses Hugging Face or S3 with LRU caching in `models/lazy_loader.py`.
-  - `/api/health` – exposes device info, corpus size, and storage mode for monitoring.
-- CORS, static hosting, and thumbnail sizing derive from environment variables defined in `config.env`.
+
+- The Backend:
+  - `backend/main.py` bootstraps FastAPI, wires routers, and injects singleton instances of the embedding model + FAISS index.
+  - Routes:
+    - `/api/search-image` – accepts the image upload, encodes via DINOv2, and queries FAISS for top-K matches.
+    - `/api/thumb/{idx}` – streams JPEG thumbnails; uses S3 with LRU caching in `models/lazy_loader.py`.
+    - `/api/health` – exposes device info, corpus size, and storage mode for monitoring.
+  - CORS, static hosting, and thumbnail sizing derive from environment variables defined in `config.env`.
 
 ### Machine Learning + Retrieval Layer
-- **EmbeddingModel** (`backend/models/embedding.py`) loads the architecture/weights specified in `bundle/model/` (JSON + PT).
-- Embeddings are normalized vectors (default 128-dim) generated by a configurable DINOv2 backbone.
-- **FAISSIndex** (`backend/models/faiss_index.py`) reads `gallery.index` plus synchronized label/path numpy arrays.
-- The `bundle/` directory is the single source of truth for artifacts, enabling reproducible, offline deployments.
+
+- **EmbeddingModel** (`embedding.py`) loads a fine-tuned DINOv2 ViT-B/14 backbone with a 128-D embedding head from the artifacts (JSON config + `.pth` weights), pulled from S3.
+- For each image, it produces a **128-dimensional L2-normalized embedding** that is used for similarity search.
+- **FAISSIndex** loads the prebuilt `gallery.index` file together with synchronized `labels.npy` and  `paths.npy` arrays that map vector IDs back to product metadata and gallery image locations.
 
 ## Getting Started Locally
 
@@ -136,7 +163,6 @@ docker compose up --build
 ```
 This launches both containers, waits for the backend health check, and wires an internal bridge network so the Express proxy talks to FastAPI securely.
 
----
 
 ## Project Layout
 - `public/` – static client (HTML/CSS/JS).
