@@ -40,7 +40,7 @@ The system has two main parts:
 ![Online search architecture](Images/Online_Search_Architecture.png)
 
 - On Startup:
-    - FastAPI backend downloads the fine-tuned DINOv2 weights, FAISS index, and metadata from S3 (or local/HF, depending on config) and loads them into memory. This enables high-speed search. 
+    - FastAPI backend downloads the fine-tuned DINOv2 weights, FAISS index, and metadata from S3 and loads them into memory. This enables high-speed search. 
 
 - Per request (`/api/search-image`):
     - The browser uploads a query image to `/api/search-image`, which is handled by the Node/Express frontend (ECS Fargate) behind the AWS ALB and proxied to the FastAPI service.
@@ -176,5 +176,5 @@ This launches both containers, waits for the backend health check, and wires an 
 - `server.js` – Express static server + API proxy for local/dev deployments.
 - `backend/` – FastAPI service, routes, models, and ML utilities.
 - `bundle/` – model weights, FAISS index, and gallery metadata (not committed with assets).
-- `docker-compose.yml` – orchestration of Node + FastAPI + shared Hugging Face cache.
+- `docker-compose.yml` – orchestration of Node + FastAPI
 - `pathUpdateModelNPY.py` – one time helper script for retargeting gallery path references after moving datasets.
