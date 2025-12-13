@@ -1,31 +1,38 @@
 # Reverse Image Search
 
-Product Search with DINOv2 and FAISS:
-This is end-to-end reverse image search engine where users upload a image and can retrieve similar items. Pre-trained transformer backbone (DINOv2 Vision) was fine-tuned with a custom 128-D projection head via triplet loss with semi-hard negative mining on ~25k images. The web application combines a lightweight web client, a FastAPI inference service, and FAISS-based vector search over fine-tuned DINOv2 embeddings, and is deployed on AWS using ECS, FARGATE.
+ ## Business problem:
+The fashion world has an overload of images (from online stores, social media, influencers), and it’s hard for people to find visually similar apparel efficiently. This project introduces an image-based search system so users can find similar apparel by uploading an image instead of typing text.
 
-The fine-tuned model achieves:
-- **~85.6% Recall@1**
-- **~94.42% Recall@5**
-- **~96.5% Recall@10**
+ ## Product Search with DINOv2 and FAISS:
+ Built an end-to-end reverse image search engine where users upload an image and can retrieve similar items. 
+ ### Model Development: 
+ - Model: Achieved state-of-the-art performance by fine-tuning a DINOv2 backbone with a custom 128-D projection head via triplet loss with semi-hard negative mining on ~25k images (**[In-Shop Clothes Retrieval Benchmark](https://mmlab.ie.cuhk.edu.hk/projects/DeepFashion/InShopRetrieval.html)** dataset), utilizing CUDA programming and NVIDIA A100 GPUs to accelerate fine-tuning.
 
-## Business problem:
-In the fast-paced landscape of fashion, the increasing volume of visual content poses a challenge for efficient search and retrieval. Recognizing this, this project aims to introduce a solution – the Deep Learning Based reverse image search. This project involves utilizing Deep Learning to analyze the intricate patterns within the user-shared image, enabling the identification of the outfit they wish to find, and suggesting similar items.
+  The fine-tuned model achieves:
+ - **~85.6% Recall@1**
+ - **~94.42% Recall@5**
+ - **~96.5% Recall@10**
+
+ ### Search System: 
+ - Vector Search Engine: Implemented FAISS (Facebook AI Similarity Search) to enable sub-millisecond search, supporting query retrieval against a massive index.
+ - Backend & API: Developed Python FastAPI service to manage model inference, orchestrate the FAISS search logic, and handle high-volume production requests. FastAPI asynchronous support enabled non-blocking I/O and efficient concurrent request handling, improving throughput and reducing end-to-end latency.
+ - Latency Optimization: Achieved near-zero search latency by loading the entire FAISS index into in-memory storage at service startup, completely eliminating slow disk I/O or network hops during query time.
+ - Caching & Optimization:
+   - LRU Caching: Utilized an LRU cache to keep hot search results in memory. 
+   - Lazy Loading: Implemented lazy loading so image data is fetched on demand
+- Frontend: HTML, Javascript and CSS
+- Deployment: The system is containerized (Docker) and deployed via AWS ECS on Fargate.
+
 
 ## Demo:
 ![AI Image Lens interface](Images/AI%20Image%20Lens%20.png)
 
 ![Top-k retrieval results](Images/Results.png)
 
-- The application demostrates very high throughput, the reasons behind high performance are:
-    - Use of FASTAPI for ultra-thin async routing
-    - The FAISS index is fully loaded into memory at startup, avoiding disk or network hops during search.
-    - LRU Cache 
-    - Lazy Loading
-
 ## System Architecture
 The system has two main parts:
 1. Online inference & search: serves the trained model behind a browser UI.
-2. Offline training & bundling: Fine-tunes DINOv2 + projection head and build the FAISS index.
+2. Offline training & bundling: Fine-tunes DINOv2 + projection head and builds the FAISS index.
 
 
 ## Online inference & search
@@ -33,7 +40,7 @@ The system has two main parts:
 ![Online search architecture](Images/Online_Search_Architecture.png)
 
 - On Startup:
-    - FastAPI backend downloads the fine-tuned DINOv2 weights, FAISS index, and metadata from S3 (or local/HF, depending on config) and loads them into memory. This enables very high speed search. 
+    - FastAPI backend downloads the fine-tuned DINOv2 weights, FAISS index, and metadata from S3 (or local/HF, depending on config) and loads them into memory. This enables high-speed search. 
 
 - Per request (`/api/search-image`):
     - The browser uploads a query image to `/api/search-image`, which is handled by the Node/Express frontend (ECS Fargate) behind the AWS ALB and proxied to the FastAPI service.

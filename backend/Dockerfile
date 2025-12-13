@@ -23,9 +23,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend source
 COPY backend /app
 
-# Copy shared assets
+# Copy shared assets into the image
 COPY bundle /bundle
-COPY config.env /config.env
 
 EXPOSE 8000
 

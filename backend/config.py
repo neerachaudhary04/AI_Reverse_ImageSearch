@@ -8,26 +8,23 @@ load_dotenv(config_path)
 
 print(f" Loading config from: {config_path}")
 
-# Choose one hugging face or S3. It can also support locally uploaded search dataset, for that img folder should be in bundle/gallery/
+# Choose one hugging face or S3. It can also support locally uploaded, for that img folder should be in bundle/gallery/
 USE_HUGGINGFACE = os.getenv("USE_HUGGINGFACE", "false").lower() == "true"
 USE_S3 = os.getenv("USE_S3", "false").lower() == "true"
 
-print(f"USE_HUGGINGFACE: {USE_HUGGINGFACE}")
-print(f"USE_S3: {USE_S3}")
 
 if USE_HUGGINGFACE:
     # Images loaded on-demand by lazy_loader.py
     # No need to download entire dataset on startup
     BUNDLE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "bundle"))
-    print(f" HuggingFace mode - images loaded on-demand")
 elif USE_S3:
     # S3 bucket specified in config.env
     BUNDLE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "bundle"))
-    print(f" S3 mode - images loaded from S3 bucket")
+   
 else:
     # Local bundle
     BUNDLE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "bundle"))
-    print(f" Local bundle mode")
+   
 
 class Config:
     """Configuration"""

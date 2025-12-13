@@ -1,0 +1,13 @@
+.git
+.gitignore
+node_modules
+backend/.venv
+**/__pycache__
+**/*.pyc
+*.log
+*.tar
+env.local
+.env*
+config.env
+backend/pip-install.log
+
