@@ -6,7 +6,7 @@ The fashion world has an overload of images (from online stores, social media, i
  ## Product Search with DINOv2 and FAISS:
  Built an end-to-end reverse image search engine where users upload an image and can retrieve similar items. 
  ### Model Development: 
- - Model: Achieved state-of-the-art performance by fine-tuning a DINOv2 backbone with a custom 128-D projection head via triplet loss with semi-hard negative mining on ~25k images (**[In-Shop Clothes Retrieval Benchmark](https://mmlab.ie.cuhk.edu.hk/projects/DeepFashion/InShopRetrieval.html)** dataset), utilizing CUDA programming and NVIDIA A100 GPUs to accelerate fine-tuning.
+ - Model: Achieved state-of-the-art performance by fine-tuning a DINOv2 backbone with a custom 128-D projection head via triplet loss with semi-hard negative mining on ~25k images, utilizing CUDA programming and NVIDIA A100 GPUs to accelerate fine-tuning.
 
   The fine-tuned model achieves:
  - **~85.6% Recall@1**
