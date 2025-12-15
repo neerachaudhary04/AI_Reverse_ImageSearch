@@ -180,3 +180,5 @@ This launches both containers, waits for the backend health check, and wires an 
 - `bundle/` – model weights, FAISS index, and gallery metadata (not committed with assets).
 - `docker-compose.yml` – orchestration of Node + FastAPI
 - `pathUpdateModelNPY.py` – one time helper script for retargeting gallery path references after moving datasets.
+
+Please feel free to reach out for model weights, docker images, demo or url. 
