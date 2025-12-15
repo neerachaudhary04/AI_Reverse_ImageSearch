@@ -1,12 +1,12 @@
-# Reverse Image Search
+# AI Image Lens
 
  ## Business problem:
-The fashion world now has an overload of images (from online stores, social media, and influencers)
-making it difficult for people to efficiently find visually similar apparel. This project introduces an image-based search system, allowing users to find similar items by uploading an image rather than typing text.
+The fashion world has an overload of images (from online stores, social media, and influencers) making it difficult for people to efficiently find visually similar apparel. This project introduces an AI Image-Based Search Retrieval System, allowing users to find similar items by uploading an image rather than typing text.
 While Google Lens is excellent for broad searches across the web, this project provides a image retrieval solution tailored to a specific dataset.
 
  ## Product Search with DINOv2 and FAISS:
- Built an end-to-end reverse image search engine where users upload an image and can retrieve similar items. 
+ Developed an end-to-end AI Image-Based Search Retrieval that transforms uploaded images into vector embeddings and retrieves similar items with sub-millisecond latency.
+ 
  ### Model Development: 
  - Model: Achieved state-of-the-art performance by fine-tuning a DINOv2 backbone with a custom 128-D projection head via triplet loss with semi-hard negative mining on ~25k images, utilizing CUDA programming and NVIDIA A100 GPUs to accelerate fine-tuning.
 
