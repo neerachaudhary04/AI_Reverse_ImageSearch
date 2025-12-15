@@ -1,7 +1,9 @@
 # Reverse Image Search
 
  ## Business problem:
-The fashion world has an overload of images (from online stores, social media, influencers), and it’s hard for people to find visually similar apparel efficiently. This project introduces an image-based search system so users can find similar apparel by uploading an image instead of typing text.
+The fashion world now has an overload of images (from online stores, social media, and influencers)
+making it difficult for people to efficiently find visually similar apparel. This project introduces an image-based search system, allowing users to find similar items by uploading an image rather than typing text.
+While Google Lens is excellent for broad searches across the web, this project provides a image retrieval solution tailored to a specific dataset.
 
  ## Product Search with DINOv2 and FAISS:
  Built an end-to-end reverse image search engine where users upload an image and can retrieve similar items. 
