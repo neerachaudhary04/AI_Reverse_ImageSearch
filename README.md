@@ -135,11 +135,16 @@ Outputs of Offline training:
     - `/api/health` – exposes device info, corpus size, and storage mode for monitoring.
   - CORS, static hosting, and thumbnail sizing derive from environment variables defined in `config.env`.
 
-### Machine Learning + Retrieval Layer
+### Machine Learning + Retrieval Layer (Inference)
+During inference, the following operations are performed for each user request: 
+- Model Initialization: The EmbeddingModel (embedding.py) initializes by loading a fine-tuned DINOv2 ViT-B/14 backbone. It pulls a 128-D embedding head and its associated artifacts (JSON config and .pth weights) directly from Amazon S3.
+- Vector Generation: For every processed image, the model generates a 128-dimensional L2-normalized embedding to facilitate high-precision similarity searches.
+- Indexing: The FAISSIndex module loads a prebuilt gallery.index file, synchronized with labels.npy and paths.npy. These arrays map internal vector IDs back to specific product metadata and image locations.
+- Query & Retrieval: The system executes in-memory queries against the FAISS index. It constructs S3 URLs only for the top-K results.
+- Optimized Fetching: To minimize latency, images are fetched from a local cache if available; otherwise, they are "lazy loaded" from S3 and subsequently cached for future use.
 
-- **EmbeddingModel** (`embedding.py`) loads a fine-tuned DINOv2 ViT-B/14 backbone with a 128-D embedding head from the artifacts (JSON config + `.pth` weights), pulled from S3.
-- For each image, it produces a **128-dimensional L2-normalized embedding** that is used for similarity search.
-- **FAISSIndex** loads the prebuilt `gallery.index` file together with synchronized `labels.npy` and  `paths.npy` arrays that map vector IDs back to product metadata and gallery image locations.
+
+
 
 ## Getting Started Locally
 
@@ -181,4 +186,4 @@ This launches both containers, waits for the backend health check, and wires an 
 - `docker-compose.yml` – orchestration of Node + FastAPI
 - `pathUpdateModelNPY.py` – one time helper script for retargeting gallery path references after moving datasets.
 
-Please feel free to reach out for model weights, docker images, demo or url. 
+Please reach out for docker images. Model weightsand docker images are not present in the repo due to file size limit. 
