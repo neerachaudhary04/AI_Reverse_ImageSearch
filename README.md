@@ -141,7 +141,7 @@ During inference, the following operations are performed for each user request:
 - Vector Generation: For every processed image, the model generates a 128-dimensional L2-normalized embedding to facilitate high-precision similarity searches.
 - Indexing: The FAISSIndex module loads a prebuilt gallery.index file, synchronized with labels.npy and paths.npy. These arrays map internal vector IDs back to specific product metadata and image locations.
 - Query & Retrieval: The system executes in-memory queries against the FAISS index. It constructs S3 URLs only for the top-K results.
-- Optimized Fetching: To minimize latency, images are fetched from a local cache if available; otherwise, they are "lazy loaded" from S3 and subsequently cached for future use.
+- Optimized Fetching: To minimize latency, images are fetched from a local cache if available; otherwise, they are lazy loaded from S3 and subsequently cached for future use.
 
 
 
@@ -186,4 +186,4 @@ This launches both containers, waits for the backend health check, and wires an 
 - `docker-compose.yml` – orchestration of Node + FastAPI
 - `pathUpdateModelNPY.py` – one time helper script for retargeting gallery path references after moving datasets.
 
-Please reach out for docker images. Model weightsand docker images are not present in the repo due to file size limit. 
+Please reach out for docker images. Model weights and docker images are not present in the repo due to file size limit. 
