@@ -27,9 +27,9 @@ While Google Lens is excellent for broad searches across the web, this project p
 
 
 ## Demo:
-![AI Image Lens interface](Images/AI%20Image%20Lens%20.png)
 
-![Top-k retrieval results](Images/Results.png)
+https://github.com/user-attachments/assets/d4cbffd9-bda1-41da-94fd-d00e126b57b6
+
 
 ## System Architecture
 The system has two main parts:
