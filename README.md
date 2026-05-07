@@ -2,7 +2,7 @@
 
  ## Business problem:
 The fashion world has an overload of images (from online stores, social media, and influencers) making it difficult for people to efficiently find visually similar apparel. This project introduces an AI Image-Based Search Retrieval System, allowing users to find similar items by uploading an image rather than typing text.
-While Google Lens is excellent for broad searches across the web, this project provides a image retrieval solution tailored to a specific dataset.
+This project provides a image retrieval solution tailored to a specific dataset.
 
  ## Product Search with DINOv2 and FAISS:
  Developed an end-to-end AI Image-Based Search Retrieval that transforms uploaded images into vector embeddings and retrieves similar items with sub-millisecond latency.
@@ -179,6 +179,7 @@ This launches both containers, waits for the backend health check, and wires an 
 
 
 ## Project Layout
+- `model_fine_tunning/` - contains complete model fine tunning workflow, including data preparation, model training, evaluation and result analysis
 - `public/` – static client (HTML/CSS/JS).
 - `server.js` – Express static server + API proxy for local/dev deployments.
 - `backend/` – FastAPI service, routes, models, and ML utilities.
@@ -186,4 +187,4 @@ This launches both containers, waits for the backend health check, and wires an 
 - `docker-compose.yml` – orchestration of Node + FastAPI
 - `pathUpdateModelNPY.py` – one time helper script for retargeting gallery path references after moving datasets.
 
-Please reach out for docker images. Model weights and docker images are not present in the repo due to file size limit. 
+Model weights and docker images are not present in the repo due to file size limit. 
