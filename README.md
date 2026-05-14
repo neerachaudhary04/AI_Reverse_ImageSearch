@@ -1,7 +1,7 @@
 # AI Image Lens
 
  ## Business problem:
-The fashion world has an overload of images (from online stores, social media, and influencers) making it difficult for people to efficiently find visually similar apparel. This project introduces an AI Image-Based Search Retrieval System, allowing users to find similar items by uploading an image rather than typing text.
+This project introduces an AI Image-Based Search Retrieval System, allowing users to find similar items by uploading an image rather than typing text.
 This project provides a image retrieval solution tailored to a specific dataset.
 
  ## Product Search with DINOv2 and FAISS:
