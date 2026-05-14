@@ -5,8 +5,8 @@ This project introduces an AI Image-Based Search Retrieval System, allowing user
 This project provides a image retrieval solution tailored to a specific dataset.
 
  ## Product Search with DINOv2 and FAISS:
- Developed an end-to-end AI Image-Based Search Retrieval that transforms uploaded images into vector embeddings and retrieves similar items with sub-millisecond latency.
- 
+The project involved fine-tuning DINOv2 (with a 128-D projection head, Triplet Loss, and semi-hard mining) and building a high-performance FastAPI backend alongside an HTML/JavaScript frontend. Finally, deployed a containerized inference and retrieval service on AWS ECS/Fargate to handle real-time model inference and FAISS-based retrieval, achieving sub-millisecond similarity search.
+
  ### Model Development: 
  - Model: Achieved state-of-the-art performance by fine-tuning a DINOv2 backbone with a custom 128-D projection head via triplet loss with semi-hard negative mining on ~25k images, utilizing CUDA programming and NVIDIA A100 GPUs to accelerate fine-tuning.
 
