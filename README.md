@@ -1,14 +1,14 @@
-# AI Image Lens — Visual Similarity Search Engine
+# AI Image Lens - Visual Similarity Search Engine
 
 This project introduces an AI Image-Based Search Retrieval System, allowing users to find similar items by uploading an image rather than typing text.
 
-Solution was derived through independent research and experimentation across multiple architectures including CNN-based ResNet and transformer-based models, concluding that DINOv2 — a self-supervised Vision Transformer — with triplet loss and semi-hard negative mining was the most effective approach for this retrieval task.
+Solution was derived through independent research and experimentation across multiple architectures including CNN-based ResNet and transformer-based models, concluding that DINOv2 - a self-supervised Vision Transformer - with triplet loss and semi-hard negative mining was the most effective approach for this retrieval task.
 
 ## Use Cases
 - Reverse image search
 - Face or person re-identification
-- Medical image similarity
-- Product search (e-commerce, fashion, furniture)
+- Image similarity search
+- Product search (e-commerce, fashion, digital assets)
 - Any domain requiring visual similarity retrieval
 
  ## Visual Similarity Search with DINOv2 and FAISS:
