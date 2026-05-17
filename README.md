@@ -1,5 +1,14 @@
 # AI Image Lens - Visual Similarity Search Engine
 
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0-orange)
+![DINOv2](https://img.shields.io/badge/DINOv2-ViT--B%2F14-green)
+![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-red)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-teal)
+![AWS](https://img.shields.io/badge/AWS-ECS%2FFargate-yellow)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![CUDA](https://img.shields.io/badge/CUDA-A100%20GPU-darkgreen)
+
 This project introduces an AI Image-Based Search Retrieval System, allowing users to find similar items by uploading an image rather than typing text.
 
 Solution was derived through independent research and experimentation across multiple architectures including CNN-based ResNet and transformer-based models, concluding that DINOv2 - a self-supervised Vision Transformer - with triplet loss and semi-hard negative mining was the most effective approach for this retrieval task.
