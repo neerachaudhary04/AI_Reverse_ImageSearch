@@ -1,7 +1,8 @@
 # AI Image Lens — Visual Similarity Search Engine
 
- ## Business problem:
 This project introduces an AI Image-Based Search Retrieval System, allowing users to find similar items by uploading an image rather than typing text.
+
+Solution was derived through independent research and experimentation across multiple architectures including CNN-based ResNet and transformer-based models, concluding that DINOv2 — a self-supervised Vision Transformer — with triplet loss and semi-hard negative mining was the most effective approach for this retrieval task.
 
 ## Use Cases
 - Reverse image search
@@ -36,9 +37,6 @@ system to be applied to any visual retrieval domain.
 
 
 ## Demo:
-The pipeline is dataset-agnostic — swapping the training dataset allows the 
-system to be applied to any visual retrieval domain.
-
 https://github.com/user-attachments/assets/d4cbffd9-bda1-41da-94fd-d00e126b57b6
 
 
@@ -190,7 +188,7 @@ This launches both containers, waits for the backend health check, and wires an 
 
 
 ## Project Layout
-- `model_fine_tuning/` - contains complete model fine_tuning workflow, including data preparation, model training, evaluation and result analysis
+- `model_fine_tuning/` - contains complete model fine-tuning workflow, including data preparation, model training, evaluation and result analysis
 - `public/` – static client (HTML/CSS/JS).
 - `server.js` – Express static server + API proxy for local/dev deployments.
 - `backend/` – FastAPI service, routes, models, and ML utilities.
