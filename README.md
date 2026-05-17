@@ -1,10 +1,16 @@
-# AI Image Lens
+# AI Image Lens — Visual Similarity Search Engine
 
  ## Business problem:
 This project introduces an AI Image-Based Search Retrieval System, allowing users to find similar items by uploading an image rather than typing text.
-This project provides a image retrieval solution tailored to a specific dataset.
 
- ## Product Search with DINOv2 and FAISS:
+## Use Cases
+- Reverse image search
+- Face or person re-identification
+- Medical image similarity
+- Product search (e-commerce, fashion, furniture)
+- Any domain requiring visual similarity retrieval
+
+ ## Visual Similarity Search with DINOv2 and FAISS:
 The project involved fine-tuning DINOv2 (with a 128-D projection head, Triplet Loss, and semi-hard mining) and building a high-performance FastAPI backend alongside an HTML/JavaScript frontend. Finally, deployed a containerized inference and retrieval service on AWS ECS/Fargate to handle real-time model inference and FAISS-based retrieval, achieving sub-millisecond similarity search.
 
  ### Model Development: 
@@ -14,6 +20,9 @@ The project involved fine-tuning DINOv2 (with a 128-D projection head, Triplet L
  - **~85.6% Recall@1**
  - **~94.42% Recall@5**
  - **~96.5% Recall@10**
+
+The pipeline is dataset-agnostic — swapping the training dataset allows the 
+system to be applied to any visual retrieval domain.
 
  ### Search System: 
  - Vector Search Engine: Implemented FAISS (Facebook AI Similarity Search) to enable sub-millisecond search, supporting query retrieval against a massive index.
@@ -27,6 +36,8 @@ The project involved fine-tuning DINOv2 (with a 128-D projection head, Triplet L
 
 
 ## Demo:
+The pipeline is dataset-agnostic — swapping the training dataset allows the 
+system to be applied to any visual retrieval domain.
 
 https://github.com/user-attachments/assets/d4cbffd9-bda1-41da-94fd-d00e126b57b6
 
@@ -179,7 +190,7 @@ This launches both containers, waits for the backend health check, and wires an 
 
 
 ## Project Layout
-- `model_fine_tunning/` - contains complete model fine tunning workflow, including data preparation, model training, evaluation and result analysis
+- `model_fine_tuning/` - contains complete model fine_tuning workflow, including data preparation, model training, evaluation and result analysis
 - `public/` – static client (HTML/CSS/JS).
 - `server.js` – Express static server + API proxy for local/dev deployments.
 - `backend/` – FastAPI service, routes, models, and ML utilities.
